@@ -2,12 +2,12 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/assets"
-    target-branch: "add-dependabot-workflow"
+    target-branch: "develop"
     schedule:
       interval: "monthly"
 
   - package-ecosystem: "mix"
     directory: "/"
-    target-branch: "add-dependabot-workflow"
+    target-branch: "develop"
     schedule:
       interval: "monthly"
