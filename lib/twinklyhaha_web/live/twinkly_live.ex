@@ -23,7 +23,7 @@ defmodule TwinklyhahaWeb.TwinklyLive do
         <%= for row <- 0..7 do %>
           <%= for _column <- 0..7 do %>
             <div class="led-box">
-            <div class="led led-<%= if @led_on?, do: "on", else: "off" %>" <%= assign_color(assigns, @current_color, row) %> phx-hook="LedColor"></div>
+            <div id="led-color" class="led led-<%= if @led_on?, do: "on", else: "off" %>" <%= assign_color(assigns, @current_color, row) %> phx-hook="LedColor"></div>
             </div>
           <% end %>
             <br/ >

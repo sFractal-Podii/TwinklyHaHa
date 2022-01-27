@@ -20,26 +20,32 @@ import "../css/app.css"
 //
 
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
+
 import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
-let Hooks = {};
+let Hooks = {}
 Hooks.LedColor = {
   updated() {
-    var leds = document.querySelectorAll(".led");
+    var leds = document.querySelectorAll(".led")
     for (let led of leds) {
-      let color = led.dataset.ledcolor ? led.dataset.ledcolor : "green";
-      let backgroundColor = `background-color: ${color};`;
-      led.setAttribute("style", `${backgroundColor}`);
+      let color = led.dataset.ledcolor ? led.dataset.ledcolor : "green"
+      let backgroundColor = `background-color: ${color};`
+      led.setAttribute("style", `${backgroundColor}`)
     }
   }
-};
+}
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let csrfToken = document
+  .querySelector("meta[name='csrf-token']")
+  .getAttribute("content");
+let liveSocket = new LiveSocket("/live", Socket, {
+  params: { _csrf_token: csrfToken },
+  hooks: Hooks
+})
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
