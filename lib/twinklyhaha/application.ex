@@ -7,6 +7,7 @@ defmodule Twinklyhaha.Application do
 
   def start(_type, _args) do
     children = [
+      Twinklyhaha.Repo,
       # Start the Telemetry supervisor
       TwinklyhahaWeb.Telemetry,
       # Start the PubSub system
