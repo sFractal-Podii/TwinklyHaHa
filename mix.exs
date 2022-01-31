@@ -34,6 +34,7 @@ defmodule Twinklyhaha.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.6"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:phoenix_ecto, "~> 4.1"},
       {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
@@ -48,6 +49,7 @@ defmodule Twinklyhaha.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_pubsub, "~> 2.0"},
+      {:sbom, git: "https://github.com/voltone/sbom"},
       {:esbuild, "~> 0.2", runtime: Mix.env() == :dev}
     ]
   end
