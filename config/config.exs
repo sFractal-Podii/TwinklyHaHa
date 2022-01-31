@@ -10,15 +10,6 @@ use Mix.Config
 config :twinklyhaha,
   ecto_repos: [Twinklyhaha.Repo]
 
-# Configure your database
-config :twinklyhaha, Twinklyhaha.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "twinklyhaha_dev",
-  hostname: "localhost",
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
-
 # Configures the endpoint
 config :twinklyhaha, TwinklyhahaWeb.Endpoint,
   url: [host: "localhost"],

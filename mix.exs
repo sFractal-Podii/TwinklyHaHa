@@ -64,7 +64,7 @@ defmodule Twinklyhaha.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "assets.deploy": ["esbuild default --minify", "phx.digest"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      test: ["test"]
     ]
   end
 end
