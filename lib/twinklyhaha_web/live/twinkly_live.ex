@@ -21,9 +21,9 @@ defmodule TwinklyhahaWeb.TwinklyLive do
     <div class="row">
     <div class="column column-50 column-offset-25">
         <%= for row <- 0..7 do %>
-          <%= for _column <- 0..7 do %>
+          <%= for column <- 0..7 do %>
             <div class="led-box">
-            <div id="led-color" class="led led-<%= if @led_on?, do: "on", else: "off" %>" <%= assign_color(assigns, @current_color, row) %> phx-hook="LedColor"></div>
+            <div class="led led-<%= if @led_on?, do: "on", else: "off" %>" id="led-<%=row %><%= column%>" <%= assign_color(assigns, @current_color, row) %> phx-hook="LedColor"></div>
             </div>
           <% end %>
             <br/ >
@@ -98,14 +98,8 @@ defmodule TwinklyhahaWeb.TwinklyLive do
   end
 
   def handle_info(color, socket)
-      when color == "rainbow" or
-             color == "red" or
-             color == "orange" or
-             color == "yellow" or
-             color == "green" or
-             color == "blue" or
-             color == "indigo" or
-             color == "violet" do
+      when color == "rainbow" or color == "red" or color == "orange" or color == "yellow" or
+             color == "green" or color == "blue" or color == "indigo" or color == "violet" do
     Logger.debug("tlive:hand.info - #{color}")
     {:noreply, current_color(socket, color, true)}
   end
