@@ -32,7 +32,7 @@ COPY lib ./lib
 COPY priv ./priv
 
 # Final build step: digest static assets and generate the release
-RUN mix phx.digest && mix release
+RUN mix assets.deploy && mix release
 
 FROM debian:buster-slim AS app
 
