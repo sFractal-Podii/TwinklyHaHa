@@ -1,0 +1,54 @@
+name: Alpha Deploy
+
+on: 
+  push:
+    tags:
+    - v*-alpha
+
+env:
+  PROJECT_ID: ${{ secrets.GCE_PROJECT }}
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: alpha
+      url: http://35.236.211.115/4000/
+      
+    env:
+      GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
+      GCE_INSTANCE_ZONE: us-east4-c
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Setup gcloud CLI
+    - uses: google-github-actions/setup-gcloud@v0
+      with:
+        version: '290.0.1'
+        service_account_key: ${{ secrets.GCE_SA_KEY }}
+        project_id: ${{ secrets.GCE_PROJECT }}
+
+    # Configure Docker to use the gcloud command-line tool as a credential
+    # helper for authentication
+    - run: |-
+        gcloud --quiet auth configure-docker
+      
+    # Build the Docker image
+    - name: Build
+      run: | 
+        echo '${{ secrets.RELEASES_SECRETS }}' >> config/releases.exs
+        docker build --tag "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}" .
+
+    # Push the Docker image to Google Container Registry
+    - name: Publish
+      run: |-
+        docker push "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}"
+    
+    - name: Deploy
+      run: |-
+        gcloud compute instances update-container "$GCE_INSTANCE" \
+          --zone "$GCE_INSTANCE_ZONE" \
+          --container-image "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}"
