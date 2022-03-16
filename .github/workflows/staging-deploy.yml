@@ -17,7 +17,7 @@ name: Staging Deploy
 on:
   push:
     branches:
-    - alpha_build_process
+    - develop
 
 env:
   PROJECT_ID: ${{ secrets.GCE_PROJECT }}
