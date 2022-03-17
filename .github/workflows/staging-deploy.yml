@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: 'http://35.245.13.116:4000'
+      url: 'http://34.150.173.73:4000'
     env:
       GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
       GCE_INSTANCE_ZONE: us-east4-c
