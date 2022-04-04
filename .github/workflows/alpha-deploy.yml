@@ -40,15 +40,15 @@ jobs:
     - name: Build
       run: | 
         echo '${{ secrets.RELEASES_SECRETS }}' >> config/releases.exs
-        docker build --tag "gcr.io/duncan-openc2-plugfest/twinklyhaha:$GITHUB_SHA" .
+        docker build --tag "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}" .
 
     # Push the Docker image to Google Container Registry
     - name: Publish
       run: |-
-        docker push "gcr.io/duncan-openc2-plugfest/twinklyhaha:$GITHUB_SHA"
+        docker push "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}"
     
     - name: Deploy
       run: |-
         gcloud compute instances update-container "$GCE_INSTANCE" \
           --zone "$GCE_INSTANCE_ZONE" \
-          --container-image "gcr.io/duncan-openc2-plugfest/twinklyhaha:$GITHUB_SHA"
+          --container-image "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}"
