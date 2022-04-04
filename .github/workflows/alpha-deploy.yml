@@ -2,8 +2,8 @@ name: Alpha Deploy
 
 on: 
   push:
-    branches:
-    - develop
+    tags:
+    - v*-alpha
 
 env:
   PROJECT_ID: ${{ secrets.GCE_PROJECT }}
