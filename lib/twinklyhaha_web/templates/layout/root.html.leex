@@ -20,6 +20,7 @@
           <img src="<%= Routes.static_path(@conn, "/images/sbomLogo.png") %>" alt="SBOM logo"/>
         </a>
         <H1>PoC/Plugfest/Hackathon</H1>
+        <h3>Version: <%= Twinklyhaha.Meta.version() %></h3>
       </div>
     </header>
     <%= @inner_content %>
