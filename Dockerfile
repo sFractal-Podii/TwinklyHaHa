@@ -16,17 +16,25 @@ COPY mix.exs .
 COPY mix.lock .
 RUN mix deps.get && mix deps.compile
 
-# Compile assets
-COPY assets ./assets
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+    apt-get install -y nodejs
 
-# Now, let's go with the actual elixir code. The order matters: if we only
-# change elixir code, all the above layers will be cached ~ less image build time.
+COPY assets ./assets
 COPY config ./config
 COPY lib ./lib
 COPY priv ./priv
 
-# Final build step: digest static assets and generate the release
-RUN mix assets.deploy && mix release
+RUN npm ci --prefix ./assets
+RUN make sbom_fast
+# make sbom for the production docker image
+RUN syft debian:buster-slim -o spdx > debian.buster_slim-spdx-bom.spdx
+RUN syft debian:buster-slim -o spdx-json > debian.buster_slim-spdx-bom.json
+RUN syft debian:buster-slim -o cyclonedx-json > debian.buster_slim-cyclonedx-bom.json
+RUN syft debian:buster-slim -o cyclonedx > debian.buster_slim-cyclonedx-bom.xml
+
+RUN cp *bom* ./priv/static/.well-known/sbom/
+RUN mix assets.deploy
+RUN mix release
 
 FROM debian:buster-slim AS app
 
