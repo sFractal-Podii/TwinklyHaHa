@@ -1,10 +1,11 @@
 # Configuration
 	# -------------
 
-APP_NAME ?= `grep 'app:' mix.exs | sed -e 's/\[//g' -e 's/ //g' -e 's/app://' -e 's/[:,]//g'`
-APP_VERSION := $(shell grep 'version:' mix.exs | cut -d '"' -f2)
+APP_NAME := $(shell grep 'app:' mix.exs | sed -e 's/\[//g' -e 's/ //g' -e 's/app://' -e 's/[:,]//g')
+APP_VERSION := $(shell grep 'version:' mix.exs | sed -e 's/\[//g' -e 's/ //g' -e 's/version://' -e 's/[:,]//g')
 DOCKER_IMAGE_TAG ?= $(APP_VERSION)
-GIT_REVISION ?= `git rev-parse HEAD`
+SBOM_FILE_NAME_CY ?= $(APP_NAME).$(APP_VERSION)-cyclonedx-sbom.1.0.0
+SBOM_FILE_NAME_SPDX ?= $(APP_NAME).$(APP_VERSION)-spdx-sbom.1.0.0
 
 # Introspection targets
 # ---------------------
@@ -103,8 +104,24 @@ deploy-existing-image: ## creates an instance using existing gcp docker image
 update-instance: ## updates image of a running instance
 	gcloud compute instances update-container $(instance-name) --container-image gcr.io/twinklymaha/haha:$(image-tag)
 
-.PHONY: sbom
+
+.PHONY: sbom sbom_fast
 sbom: ## creates sbom for both  npm and hex dependancies
 	mix deps.get && mix sbom.cyclonedx -o elixir_bom.xml
-	cd assets/  && npm install && npm install -g @cyclonedx/bom && cyclonedx-bom -o ../bom.xml -a ../elixir_bom.xml && cd ..
-	./cyclonedx-cli convert --input-file bom.xml --output-file bom.json
+	cd assets/  && npm install && npm install @cyclonedx/bom@3.4.1 && ./node_modules/@cyclonedx/bom/bin/make-bom.js -o ../$(SBOM_FILE_NAME_CY).xml && cd ..
+	./cyclonedx-cli merge --name $(APP_NAME) --version $(APP_VERSION) --input-files ./$(SBOM_FILE_NAME_CY).xml ./elixir_bom.xml --output-file $(SBOM_FILE_NAME_CY)-all.xml
+	./cyclonedx-cli convert --input-file $(SBOM_FILE_NAME_CY)-all.xml --output-file $(SBOM_FILE_NAME_CY).json
+	./cyclonedx-cli convert --input-file $(SBOM_FILE_NAME_CY).json --output-format spdxjson --output-file $(SBOM_FILE_NAME_SPDX).spdx
+	rm $(SBOM_FILE_NAME_CY).xml && mv $(SBOM_FILE_NAME_CY)-all.xml $(SBOM_FILE_NAME_CY).xml
+	cp $(SBOM_FILE_NAME_CY).* priv/static/.well-known/sbom
+	cp $(SBOM_FILE_NAME_SPDX).* priv/static/.well-known/sbom
+
+sbom_fast: ## creates sbom without dependancy instalment, assumes you have cyclonedx-bom javascript package installed globally
+	mix sbom.cyclonedx -o elixir_bom.xml
+	cd assets/ && ./node_modules/@cyclonedx/bom/bin/make-bom.js -o ../$(SBOM_FILE_NAME_CY).xml && cd ..
+	./cyclonedx-cli merge --name $(APP_NAME) --version $(APP_VERSION) --input-files ./$(SBOM_FILE_NAME_CY).xml ./elixir_bom.xml --output-file $(SBOM_FILE_NAME_CY)-all.xml
+	./cyclonedx-cli convert --input-file $(SBOM_FILE_NAME_CY)-all.xml --output-file $(SBOM_FILE_NAME_CY).json
+	./cyclonedx-cli convert --input-file $(SBOM_FILE_NAME_CY).json --output-format spdxjson --output-file $(SBOM_FILE_NAME_SPDX).spdx
+	rm $(SBOM_FILE_NAME_CY).xml && mv $(SBOM_FILE_NAME_CY)-all.xml $(SBOM_FILE_NAME_CY).xml
+	cp $(SBOM_FILE_NAME_CY).* priv/static/.well-known/sbom
+	cp $(SBOM_FILE_NAME_SPDX).* priv/static/.well-known/sbom
