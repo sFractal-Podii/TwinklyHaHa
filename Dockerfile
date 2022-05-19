@@ -24,7 +24,6 @@ COPY config ./config
 COPY lib ./lib
 COPY priv ./priv
 
-RUN npm ci --prefix ./assets
 RUN make sbom_fast
 # make sbom for the production docker image
 RUN syft debian:buster-slim -o spdx > debian.buster_slim-spdx-bom.spdx
