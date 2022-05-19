@@ -2,6 +2,7 @@
 FROM elixir:1.11.2 AS app_builder
 
 ARG env=prod
+ARG cyclonedx_cli_version=v0.24.0
 
 ENV LANG=C.UTF-8 \
    TERM=xterm \
