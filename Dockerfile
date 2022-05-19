@@ -23,6 +23,7 @@ COPY assets ./assets
 COPY config ./config
 COPY lib ./lib
 COPY priv ./priv
+COPY Makefile ./Makefile
 
 RUN make sbom_fast
 # make sbom for the production docker image
