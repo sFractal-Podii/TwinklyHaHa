@@ -11,6 +11,7 @@ RUN mkdir /opt/release
 WORKDIR /opt/release
 
 RUN mix local.hex --force && mix local.rebar --force
+RUN curl -L  https://github.com/CycloneDX/cyclonedx-cli/releases/download/$cyclonedx_cli_version/cyclonedx-linux-x64 --output cyclonedx-cli && chmod a+x cyclonedx-cli
 
 COPY mix.exs .
 COPY mix.lock .
@@ -25,7 +26,7 @@ COPY lib ./lib
 COPY priv ./priv
 COPY Makefile ./Makefile
 
-RUN make sbom_fast
+RUN make sbom
 # make sbom for the production docker image
 RUN syft debian:buster-slim -o spdx > debian.buster_slim-spdx-bom.spdx
 RUN syft debian:buster-slim -o spdx-json > debian.buster_slim-spdx-bom.json
