@@ -17,7 +17,7 @@ name: Staging Deploy
 on:
   push:
     branches:
-    - develop
+    - temp_fix
 
 env:
   PROJECT_ID: ${{ secrets.GCE_PROJECT }}
