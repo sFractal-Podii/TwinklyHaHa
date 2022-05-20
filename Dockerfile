@@ -19,7 +19,7 @@ COPY mix.lock .
 RUN mix deps.get && mix deps.compile
 
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
-    apt-get install -y nodejs make
+    apt-get install -y nodejs
 
 COPY assets ./assets
 COPY config ./config
