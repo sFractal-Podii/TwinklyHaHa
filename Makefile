@@ -113,7 +113,7 @@ sbom: ## creates sbom for both  npm and hex dependancies
 	./cyclonedx-cli convert --input-file $(SBOM_FILE_NAME_CY)-all.xml --output-file $(SBOM_FILE_NAME_CY).json
 	./cyclonedx-cli convert --input-file $(SBOM_FILE_NAME_CY).json --output-format spdxjson --output-file $(SBOM_FILE_NAME_SPDX).spdx
 	rm $(SBOM_FILE_NAME_CY).xml && mv $(SBOM_FILE_NAME_CY)-all.xml $(SBOM_FILE_NAME_CY).xml
-	cp $(SBOM_FILE_NAME_CY).* priv/static/.well-known/
+	cp $(SBOM_FILE_NAME_CY).* priv/static/.well-known/sbom/
 	cp $(SBOM_FILE_NAME_SPDX).* priv/static/.well-known/sbom
 
 sbom_fast: ## creates sbom without dependancy instalment, assumes you have cyclonedx-bom javascript package installed globally
