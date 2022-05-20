@@ -4,5 +4,4 @@ defmodule TwinklyhahaWeb.PageController do
   def sbom(conn, _params) do
     render(conn, "sbom.html")
   end
-
-  end
+end
