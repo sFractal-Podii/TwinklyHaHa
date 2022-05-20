@@ -1,5 +1,6 @@
 defmodule TwinklyhahaWeb.PageView do
   use TwinklyhahaWeb, :view
+
   def render("sbom.html", _assigns) do
     files =
       :twinklyhaha

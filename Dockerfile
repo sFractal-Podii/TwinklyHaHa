@@ -13,6 +13,7 @@ WORKDIR /opt/release
 
 RUN mix local.hex --force && mix local.rebar --force
 RUN curl -L  https://github.com/CycloneDX/cyclonedx-cli/releases/download/$cyclonedx_cli_version/cyclonedx-linux-x64 --output cyclonedx-cli && chmod a+x cyclonedx-cli
+RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
 COPY mix.exs .
 COPY mix.lock .
