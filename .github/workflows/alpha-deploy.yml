@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: alpha
-      url: http://35.236.211.115:4000/
+      url: http://35.236.211.115:4000/ ##use the one generated on deployment
       
     env:
       GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
