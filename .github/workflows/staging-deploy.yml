@@ -17,7 +17,7 @@ name: Staging Deploy
 on:
   push:
     branches:
-    - deploy_to_cloud_run
+    - develop
 
 env:
   PROJECT_ID: ${{ secrets.GCE_PROJECT }}
