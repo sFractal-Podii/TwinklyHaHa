@@ -5,9 +5,9 @@ defmodule Twinklyhaha.MixProject do
     [
       app: :twinklyhaha,
       version: "0.4.3",
-      elixir: "~> 1.7",
+      elixir: "~> 1.15.4",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix] ++ Mix.compilers(),
+      compilers: [] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -33,24 +33,25 @@ defmodule Twinklyhaha.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6"},
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:phoenix_ecto, "~> 4.1"},
-      {:ecto_sql, "~> 3.4"},
+      {:phoenix, "~> 1.7.7"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:phoenix_ecto, "~> 4.4"},
+      {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_live_view, "~> 0.16.4"},
-      {:floki, ">= 0.0.0", only: :test},
-      {:phoenix_html, "~> 3.0"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_dashboard, "~> 0.5"},
+      {:phoenix_live_view, "~> 0.19.5"},
+      {:floki, ">= 0.34.3", only: :test},
+      {:phoenix_html, "~> 3.3"},
+      {:phoenix_live_reload, "~> 1.4", only: :dev},
+      {:phoenix_live_dashboard, "~> 0.8"},
+      {:phoenix_view, "~> 2.0"},
       {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_poller, "~> 0.5"},
-      {:gettext, "~> 0.11"},
-      {:jason, "~> 1.0"},
+      {:telemetry_poller, "~> 1.0.0"},
+      {:gettext, "~> 0.23"},
+      {:jason, "~> 1.4"},
       {:plug_cowboy, "~> 2.0"},
-      {:phoenix_pubsub, "~> 2.0"},
+      {:phoenix_pubsub, "~> 2.1"},
       {:sbom, git: "https://github.com/voltone/sbom", runtime: false},
-      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev}
+      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev}
     ]
   end
 
