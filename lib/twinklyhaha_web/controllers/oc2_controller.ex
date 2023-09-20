@@ -6,6 +6,12 @@ defmodule TwinklyhahaWeb.OC2Controller do
   @on "on"
   @off "off"
 
+  #
+  #
+  #This section is kinda similar to check_oc2.ex in openc2 dep
+  #
+  #
+  #
   def command(conn, params) do
     Logger.debug("oc2_controller command #{inspect(params)}")
     ## check top level components of command json
@@ -34,6 +40,12 @@ defmodule TwinklyhahaWeb.OC2Controller do
         do_action(conn, params)
     end
   end
+
+#
+#
+#This section is kinda similar to do_set.ex in openc2 dep
+#
+#
 
   defp do_action(conn, params = %{"action" => "set"}) do
     Logger.debug("do_action set #{inspect(params)}")
@@ -72,6 +84,12 @@ defmodule TwinklyhahaWeb.OC2Controller do
     end
   end
 
+#
+#
+#This section is kinda similar to do_query.ex in openc2 dep
+#
+#
+
   defp do_action(conn, params = %{"action" => "query"}) do
     Logger.debug("do_action query #{inspect(params)}")
     %{"target" => target} = params
@@ -97,6 +115,12 @@ defmodule TwinklyhahaWeb.OC2Controller do
     end
   end
 
+#
+#not sure where the below actions fall under
+#
+#
+#
+
   defp do_action(conn, params = %{"action" => "allow"}) do
     Logger.debug("do_action allow #{inspect(params)}")
     ## json(conn, %{ok: "got to allow, need to finish coding"})
@@ -118,6 +142,11 @@ defmodule TwinklyhahaWeb.OC2Controller do
     ## :unprocessable_entity - 422
     send_resp(conn, :unprocessable_entity, "Oops! action=#{whataction}?")
   end
+#
+#
+#This section is kinda similar to do_query_sbom.ex in openc2 dep
+#
+#
 
   defp do_action_sbom(conn, sbom_attr) do
     Logger.debug("do_action_sbom")
@@ -147,6 +176,11 @@ defmodule TwinklyhahaWeb.OC2Controller do
         send_resp(conn, :unprocessable_entity, error_msg)
     end
   end
+#
+#
+#This section is kinda similar to do_query_features.ex in openc2 dep
+#
+#
 
   defp do_action_features(conn, []) do
     Logger.debug("do_action_features empty list")
@@ -180,7 +214,7 @@ defmodule TwinklyhahaWeb.OC2Controller do
     error_msg = "Oops! query features not a list"
     send_resp(conn, :unprocessable_entity, error_msg)
   end
-
+#=======================================related to do_set.ex=================================
   defp do_action_set_led(conn, attr) when attr == "on" do
     Logger.debug("do_action_set_led on")
     set_led_on(conn)
@@ -210,6 +244,7 @@ defmodule TwinklyhahaWeb.OC2Controller do
     set_matrix_rainbow(conn)
   end
 
+  #============================general function used in most functions===================================
   defp check_one_map_key(in_map) do
     ## check it is a map and has one key.
     ## return error or the key and the value of the key
@@ -241,6 +276,7 @@ defmodule TwinklyhahaWeb.OC2Controller do
         :error
     end
   end
+#=======================================related to do_query_sbom.ex=================================
 
   defp return_sbom([]) do
     ## empty list - error since can't do any
@@ -297,6 +333,8 @@ defmodule TwinklyhahaWeb.OC2Controller do
     return_map = %{status: "ok", results: results}
     return_map
   end
+
+#=======================================related to do_query_features.ex=================================
 
   defp iterate_features(output, []) do
     ## done
@@ -364,6 +402,7 @@ defmodule TwinklyhahaWeb.OC2Controller do
         {:error, "unknown feature"}
     end
   end
+#=======================================related to do_set.ex =================================
 
   defp set_led_on(conn) do
     Logger.debug("oc2_c:set_led_on")
