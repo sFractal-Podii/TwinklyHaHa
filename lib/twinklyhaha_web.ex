@@ -45,7 +45,7 @@ defmodule TwinklyhahaWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {TwinklyhahaWeb.LayoutView, "live.html"}
+        layout: {TwinklyhahaWeb.LayoutView, :live}
 
       unquote(view_helpers())
     end
@@ -82,7 +82,7 @@ defmodule TwinklyhahaWeb do
       use Phoenix.HTML
 
       # Import LiveView helpers (live_render, live_component, live_patch, etc)
-      import Phoenix.LiveView.Helpers
+      import Phoenix.Component
 
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
