@@ -24,6 +24,9 @@ jobs:
       with:
         version-file: .tool-versions
         version-type: strict
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: .tool-versions
     - name: Restore dependencies cache
       uses: actions/cache@v2
       with:
