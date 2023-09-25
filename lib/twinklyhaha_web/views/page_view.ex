@@ -15,7 +15,7 @@ defmodule TwinklyhahaWeb.PageView do
 
   defp filter_files(files, filter) do
     regex = Regex.compile!(filter)
-    files |> Enum.filter(fn file -> Regex.match?(regex, file) end)
+    Enum.filter(files, fn file -> Regex.match?(regex, file) end)
   end
 
   defp sbom_files do
@@ -24,8 +24,8 @@ defmodule TwinklyhahaWeb.PageView do
       |> Application.app_dir("/priv/static/.well-known/sbom")
       |> File.ls!()
 
-      Enum.reduce(["cyclonedx", "spdx", "vex"], %{}, fn filter, acc ->
-        Map.put(acc, filter, filter_files(files, filter))
-      end)
+    Enum.reduce(["cyclonedx", "spdx", "vex"], %{}, fn filter, acc ->
+      Map.put(acc, filter, filter_files(files, filter))
+    end)
   end
 end
