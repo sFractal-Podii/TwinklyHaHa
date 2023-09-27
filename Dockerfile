@@ -7,13 +7,14 @@ ARG NODE_MAJOR=20
 
 ENV LANG=C.UTF-8 \
    TERM=xterm \
-   MIX_ENV=$env
+   MIX_ENV=$env \
+   DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
 RUN mkdir /opt/release
 WORKDIR /opt/release
 
 RUN mix local.hex --force && mix local.rebar --force
-RUN apt-get update -y && apt-get install curl git make  -y
+RUN apt-get update -y && apt-get install make curl git  -y
 
 RUN curl -L  https://github.com/CycloneDX/cyclonedx-cli/releases/download/$cyclonedx_cli_version/cyclonedx-linux-x64 --output cyclonedx-cli \
    && chmod a+x cyclonedx-cli \
