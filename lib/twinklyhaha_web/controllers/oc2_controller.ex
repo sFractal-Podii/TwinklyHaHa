@@ -7,37 +7,48 @@ defmodule TwinklyhahaWeb.OC2Controller do
   @off "off"
 
   def command(conn, params) do
-    Logger.debug("oc2_controller command #{inspect(params)}")
-    ## check top level components of command json
-    tops = Map.keys(params)
+    params
+      |> Openc2.Oc2.Command.new()
+      # execute
+      |> Openc2.Oc2.Command.do_cmd()
 
-    cond do
-      ## is action missing?
-      "action" not in tops ->
-        ## :unprocessable_entity - 422
-        Logger.debug("command no action #{inspect(params)}")
-        Logger.debug("command no action #{inspect(conn)}")
-        send_resp(conn, :unprocessable_entity, "Oops! no action?")
+      #Add openc2 library
+      #call command.new
+      #call command.doc_cmd
+      #if do.cmd returns an error  send_resp(conn, :unprocessable_entity, "Oops! bad target")
+      #if successful use target specifier to publish the command
+      #=======================================
+    # Logger.debug("oc2_controller command #{inspect(params)}")
+    # ## check top level components of command json
+    # tops = Map.keys(params)
 
-      ## is target missing?
-      "target" not in tops ->
-        Logger.debug("command no target #{inspect(params)}")
-        send_resp(conn, :unprocessable_entity, "Oops! no target?")
+    # cond do
+    #   ## is action missing?
+    #   "action" not in tops ->
+    #     ## :unprocessable_entity - 422
+    #     Logger.debug("command no action #{inspect(params)}")
+    #     Logger.debug("command no action #{inspect(conn)}")
+    #     send_resp(conn, :unprocessable_entity, "Oops! no action?")
 
-      ## extra top level fields
-      0 != length(tops -- ["action", "target", "args", "actuator"]) ->
-        Logger.debug("command top level error #{inspect(params)}")
-        send_resp(conn, :unprocessable_entity, "Oops! top level fields?")
+    #   ## is target missing?
+    #   "target" not in tops ->
+    #     Logger.debug("command no target #{inspect(params)}")
+    #     send_resp(conn, :unprocessable_entity, "Oops! no target?")
 
-      true ->
-        ## good so far
-        do_action(conn, params)
-    end
+    #   ## extra top level fields
+    #   0 != length(tops -- ["action", "target", "args", "actuator"]) ->
+    #     Logger.debug("command top level error #{inspect(params)}")
+    #     send_resp(conn, :unprocessable_entity, "Oops! top level fields?")
+
+    #   true ->
+    #     ## good so far
+    #     do_action(conn, params)
+    # end
   end
 
   defp do_action(conn, params = %{"action" => "set"}) do
     Logger.debug("do_action set #{inspect(params)}")
-    %{"target" => target} = params
+    %{"target" => target} = params |> IO.inspect
 
     case check_one_map_key(target) do
       ## validate is a map and extract the one target and it's attributes
