@@ -7,17 +7,27 @@ defmodule TwinklyhahaWeb.OC2Controller do
   @off "off"
 
   def command(conn, params) do
-    params
+    command =
+      params
+      |> Jason.encode!()
       |> Openc2.Oc2.Command.new()
-      # execute
       |> Openc2.Oc2.Command.do_cmd()
 
-      #Add openc2 library
-      #call command.new
-      #call command.doc_cmd
-      #if do.cmd returns an error  send_resp(conn, :unprocessable_entity, "Oops! bad target")
-      #if successful use target specifier to publish the command
-      #=======================================
+    case command.target do
+      nil ->
+        send_resp(conn, :unprocessable_entity, "Oops! no target?")
+
+      _ ->
+        Phoenix.PubSub.broadcast(Twinklyhaha.PubSub, "leds", command.target_specifier)
+        json(conn, %{status: :ok})
+    end
+
+    # Add openc2 library
+    # call command.new
+    # call command.doc_cmd
+    # if do.cmd returns an error  send_resp(conn, :unprocessable_entity, "Oops! bad target")
+    # if successful use target specifier to publish the command
+    # =======================================
     # Logger.debug("oc2_controller command #{inspect(params)}")
     # ## check top level components of command json
     # tops = Map.keys(params)
@@ -48,7 +58,7 @@ defmodule TwinklyhahaWeb.OC2Controller do
 
   defp do_action(conn, params = %{"action" => "set"}) do
     Logger.debug("do_action set #{inspect(params)}")
-    %{"target" => target} = params |> IO.inspect
+    %{"target" => target} = params |> IO.inspect()
 
     case check_one_map_key(target) do
       ## validate is a map and extract the one target and it's attributes
