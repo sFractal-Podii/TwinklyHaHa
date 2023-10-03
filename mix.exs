@@ -51,7 +51,8 @@ defmodule Twinklyhaha.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_pubsub, "~> 2.0"},
       {:sbom, git: "https://github.com/voltone/sbom", runtime: false},
-      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev}
+      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
+      {:openc2, git: "https://github.com/sFractal-Podii/openc2.git", branch: "main"}
     ]
   end
 
