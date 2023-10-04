@@ -7,13 +7,11 @@ defmodule TwinklyhahaWeb.OC2Controller do
   @off "off"
 
   def command(conn, params) do
-     IO.inspect(params, label: "=========params=========")
     command =
       params
       |> Jason.encode!()
       |> Openc2.Oc2.Command.new()
       |> Openc2.Oc2.Command.do_cmd()
-    IO.inspect(command, label: "==================")
     case command.target do
       nil ->
         send_resp(conn, :unprocessable_entity, "Oops! no target?")
@@ -31,36 +29,9 @@ defmodule TwinklyhahaWeb.OC2Controller do
     # if do.cmd returns an error  send_resp(conn, :unprocessable_entity, "Oops! bad target")
     # if successful use target specifier to publish the command
     # =======================================
-
-
-    # Logger.debug("oc2_controller command #{inspect(params)}")
-    # ## check top level components of command json
-    # tops = Map.keys(params)
-
-    # cond do
-    #   ## is action missing?
-    #   "action" not in tops ->
-    #     ## :unprocessable_entity - 422
-    #     Logger.debug("command no action #{inspect(params)}")
-    #     Logger.debug("command no action #{inspect(conn)}")
-    #     send_resp(conn, :unprocessable_entity, "Oops! no action?")
-
-    #   ## is target missing?
-    #   "target" not in tops ->
-    #     Logger.debug("command no target #{inspect(params)}")
-    #     send_resp(conn, :unprocessable_entity, "Oops! no target?")
-
-    #   ## extra top level fields
-    #   0 != length(tops -- ["action", "target", "args", "actuator"]) ->
-    #     Logger.debug("command top level error #{inspect(params)}")
-    #     send_resp(conn, :unprocessable_entity, "Oops! top level fields?")
-
-    #   true ->
-    #     ## good so far
-    #     do_action(conn, params)
-    # end
   end
 
+  ###OLD CODE BELOW FOR REFERENCE WHILE IMPLEMENTING SBOM
   defp do_action(conn, params = %{"action" => "set"}) do
     Logger.debug("do_action set #{inspect(params)}")
     %{"target" => target} = params |> IO.inspect()
