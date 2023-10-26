@@ -46,12 +46,12 @@ jobs:
     - name: Build
       run: | 
         echo '${{ secrets.RELEASES_SECRETS }}' >> config/releases.exs
-        docker build --tag "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF_NAME}" .
+        docker build --tag "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}" .
 
     # Push the Docker image to Google Container Registry
     - name: Publish
       run: |-
-        docker push "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF_NAME}"
+        docker push "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}"
     
     - name: Deploy to Cloud Run 
       id: deploy
@@ -59,4 +59,4 @@ jobs:
       with:
         service: twinklyhaha-alpha
         region: us-east4
-        image: "gcr.io/duncan-openc2-plugfest/twinklyhaha:${{ github.ref_name }}"
+        image: "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF##*/}"
