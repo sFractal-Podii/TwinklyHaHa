@@ -1,6 +1,7 @@
 defmodule TwinklyhahaWeb.OC2Controller do
   require Logger
   use TwinklyhahaWeb, :controller
+  alias Openc2.Oc2.Command
 
   @topic "leds"
 
