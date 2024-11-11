@@ -20,9 +20,9 @@ defmodule TwinklyhahaWeb do
   def controller do
     quote do
       use Phoenix.Controller, namespace: TwinklyhahaWeb
+      use Gettext, backend: TwinklyhahaWeb.Gettext
 
       import Plug.Conn
-      import TwinklyhahaWeb.Gettext
       alias TwinklyhahaWeb.Router.Helpers, as: Routes
     end
   end
@@ -72,14 +72,16 @@ defmodule TwinklyhahaWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import TwinklyhahaWeb.Gettext
+      use Gettext, backend: TwinklyhahaWeb.Gettext
     end
   end
 
   defp view_helpers do
     quote do
       # Use all HTML functionality (forms, tags, etc)
-      use Phoenix.HTML
+      import Phoenix.HTML
+      import Phoenix.HTML.Form
+      use PhoenixHTMLHelpers
 
       # Import LiveView helpers (live_render, live_component, live_patch, etc)
       import Phoenix.Component
@@ -88,7 +90,8 @@ defmodule TwinklyhahaWeb do
       import Phoenix.View
 
       import TwinklyhahaWeb.ErrorHelpers
-      import TwinklyhahaWeb.Gettext
+      use Gettext, backend: TwinklyhahaWeb.Gettext
+      import TwinklyhahaWeb.CoreComponents
       alias TwinklyhahaWeb.Router.Helpers, as: Routes
     end
   end
