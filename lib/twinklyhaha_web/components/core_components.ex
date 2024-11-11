@@ -1,4 +1,5 @@
 defmodule TwinklyhahaWeb.CoreComponents do
+  @moduledoc false
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
