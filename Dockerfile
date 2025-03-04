@@ -44,12 +44,12 @@ RUN make sbom && cp *bom* ./priv/static/.well-known/sbom/
 
 RUN mix assets.deploy && mix release
 
-FROM debian:bookworm-slim AS app
-
+FROM debian:bullseye-slim AS app
 
 ENV LANG=C.UTF-8
 
 RUN apt-get update && apt-get install -y openssl
+
 
 RUN useradd --create-home app
 WORKDIR /home/app
