@@ -34,3 +34,14 @@ jobs:
         run: mix test
       - name: Check lints
         run: make lint
+
+  build-docker-image:
+    name: Build Docker Image
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install prerequisites
+        run: sudo apt-get update && sudo apt-get install build-essential -y
+      - name: Build Docker Image
+        run: make docker-image
