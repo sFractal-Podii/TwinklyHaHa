@@ -50,7 +50,7 @@ FROM debian:bookworm-slim AS app
 ENV LANG=C.UTF-8
 
 RUN apt-get update \
-   && apt-get install gdebi-core -y \
+   && apt-get install wget gdebi-core -y \
    && wget http://ftp.us.debian.org/debian/pool/main/o/openssl/libssl1.1_1.1.1n-0+deb11u4_amd64.deb \
    && gdebi --non-interactive libssl1.1_1.1.1n-0+deb11u4_amd64.deb
 
