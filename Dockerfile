@@ -44,15 +44,11 @@ RUN make sbom && cp *bom* ./priv/static/.well-known/sbom/
 
 RUN mix assets.deploy && mix release
 
-FROM debian:bookworm-slim AS app
-
+FROM debian:bullseye-slim AS app
 
 ENV LANG=C.UTF-8
 
-RUN apt-get update \
-   && apt-get install wget gdebi-core -y \
-   && wget http://ftp.us.debian.org/debian/pool/main/o/openssl/libssl1.1_1.1.1n-0+deb11u4_amd64.deb \
-   && gdebi --non-interactive libssl1.1_1.1.1n-0+deb11u4_amd64.deb
+RUN apt-get update && apt-get install -y openssl
 
 
 RUN useradd --create-home app
