@@ -45,7 +45,7 @@ defmodule Twinklyhaha.MixProject do
       {:ecto_sql, "~> 3.12"},
       {:postgrex, ">= 0.0.0"},
       {:floki, ">= 0.0.0", only: :test},
-      {:telemetry_metrics, "~> 1.0.0"},
+      {:telemetry_metrics, "~> 1.1.0"},
       {:telemetry_poller, "~> 1.1.0"},
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.4"},
