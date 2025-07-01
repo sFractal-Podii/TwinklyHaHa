@@ -46,7 +46,7 @@ jobs:
 
           git add mix.exs
           git commit -m "chore: bump version to $VERSION from tag"
-          git push origin HEAD:develop
+          git push --force origin HEAD:refs/tags/${GITHUB_REF_NAME}
 
       - id: "auth"
         uses: "google-github-actions/auth@v2"
