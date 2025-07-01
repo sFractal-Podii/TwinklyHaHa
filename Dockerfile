@@ -1,5 +1,5 @@
 # heavily borrowed from https://elixirforum.com/t/cannot-find-libtinfo-so-6-when-launching-elixir-app/24101/11?u=sigu
-FROM hexpm/elixir:1.17.3-erlang-27.0.1-debian-bullseye-20241202 AS app_builder
+FROM hexpm/elixir:1.17.3-erlang-27.3.4-debian-bullseye-20250520 AS app_builder
 
 ARG env=prod
 ARG cyclonedx_cli_version=v0.24.0
@@ -23,6 +23,7 @@ RUN curl -L  https://github.com/CycloneDX/cyclonedx-cli/releases/download/$cyclo
    && syft debian:bookworm-slim -o spdx-json > debian.bookworm_slim-spdx-bom.json \
    && syft debian:bookworm-slim -o cyclonedx-json > debian.bookworm_slim-cyclonedx-bom.json \
    && syft debian:bookworm-slim -o cyclonedx > debian.bookworm_slim-cyclonedx-bom.xml 
+
 RUN apt install ca-certificates gnupg -y \
    && mkdir -p /etc/apt/keyrings \
    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
@@ -40,9 +41,21 @@ COPY lib ./lib
 COPY priv ./priv
 COPY Makefile ./Makefile
 
-RUN make sbom && cp *bom* ./priv/static/.well-known/sbom/
 
-RUN mix assets.deploy && mix release
+RUN MIX_ENV=dev mix deps.compile \
+   && MIX_ENV=dev mix sbom.install \
+   && MIX_ENV=dev mix sbom.cyclonedx \
+   && MIX_ENV=dev mix sbom.convert
+
+RUN syft debian:bullseye-slim -o spdx > debian.buster_slim-spdx-bom.spdx
+RUN syft debian:bullseye-slim -o spdx-json > debian.buster_slim-spdx-bom.json
+RUN syft debian:bullseye-slim -o cyclonedx-json > debian.buster_slim-cyclonedx-bom.json
+RUN syft debian:bullseye-slim -o cyclonedx > debian.buster_slim-cyclonedx-bom.xml
+
+RUN cp *bom* ./priv/static/.well-known/sbom/
+
+RUN mix assets.deploy
+RUN mix release
 
 FROM debian:bullseye-slim AS app
 

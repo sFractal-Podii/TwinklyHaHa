@@ -50,7 +50,11 @@ defmodule Twinklyhaha.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.4"},
       {:plug_cowboy, "~> 2.7"},
-      {:sbom, git: "https://github.com/voltone/sbom", runtime: false},
+      {:sbom,
+       only: :dev,
+       git: "https://github.com/sigu/sbom.git",
+       branch: "auto-install-bom",
+       runtime: false},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:openc2, git: "https://github.com/sFractal-Podii/openc2.git", branch: "main"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
