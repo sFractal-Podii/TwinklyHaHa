@@ -1,14 +1,12 @@
 name: add sbom to releases
 
 on:
-  workflow_run:
-    workflows: ["Alpha Deploy", "Prod Deploy"]
-    types:
-      - completed
+  push:
+    tags:
+      - v*
 
 jobs:
   add_sbom:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,6 +20,14 @@ jobs:
         with:
           version-file: .tool-versions
           version-type: strict
+
+      - name: Update mix.exs version to match tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"       # e.g., v1.2.3
+          VERSION="${TAG#v}"                   # e.g., 1.2.3
+          echo "Updating mix.exs to version: $VERSION"
+          sed -i.bak -E "s/(version:\s*\")[^\"]+\"/\1${VERSION}\"/" mix.exs
+          rm mix.exs.bak
 
       - name: Install dependencies
         run: mix deps.get
