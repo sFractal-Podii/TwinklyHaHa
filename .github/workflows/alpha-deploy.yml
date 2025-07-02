@@ -9,12 +9,15 @@ env:
   PROJECT_ID: ${{ secrets.GCE_PROJECT }}
 
 jobs:
-  deploy:
-    name: Trigger Version PR and Deploy
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
     runs-on: ubuntu-latest
+    environment:
+      name: alpha
     permissions:
       contents: write
       id-token: write
+      pull-requests: write  # Required for PR actions
 
     env:
       GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
@@ -23,25 +26,48 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Elixir
-        uses: erlef/setup-beam@v1
         with:
-          version-file: .tool-versions
-          version-type: strict
+          fetch-depth: 0
 
-      - name: Extract tag version
-        id: extract_version
+      - name: Extract tag version and update mix.exs
+        id: update_mix
         run: |
-          TAG="${GITHUB_REF#refs/tags/}"      # v0.5.5-alpha
-          VERSION="${TAG#v}"                  # 0.5.5-alpha
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Trigger version bump PR workflow
+          sed -i.bak -E "s/(version:\s*\")[^\"]+\"/\1${VERSION}\"/" mix.exs
+          rm mix.exs.bak
+          echo "Updated mix.exs to version $VERSION"
+
+      - name: Create Pull Request to update version
         run: |
-          gh workflow run "Create Version PR" \
-            --ref develop \
-            -f version="${VERSION}"
+          VERSION="${{ env.VERSION }}"
+          BRANCH="bump-version-to-${VERSION}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add mix.exs
+          git commit -m "chore: bump version to $VERSION from tag"
+          git push origin "$BRANCH"
+
+          sleep 5
+          gh pr create \
+            --base develop \
+            --head "$BRANCH" \
+            --title "chore: bump version to $VERSION from tag" \
+            --body "This PR updates \`mix.exs\` to version \`$VERSION\` from tag \`$GITHUB_REF_NAME\`"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge once checks pass
+        run: |
+          VERSION="${{ env.VERSION }}"
+          PR_URL=$(gh pr view bump-version-to-${VERSION} --json url -q .url)
+          echo "Enabling auto-merge on PR: $PR_URL"
+          gh pr merge "$PR_URL" --auto --squash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -71,3 +97,4 @@ jobs:
           service: twinklyhaha-alpha
           region: us-east4
           image: "gcr.io/duncan-openc2-plugfest/twinklyhaha:${{ github.ref_name }}"
+
