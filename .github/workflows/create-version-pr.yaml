@@ -1,0 +1,50 @@
+name: Create Version PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to bump to (e.g. 0.5.5-alpha)"
+        required: true
+
+jobs:
+  bump-version:
+    name: Bump Version and Create PR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update mix.exs version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          BRANCH="bump-version-to-${VERSION}"
+          git checkout -b "$BRANCH"
+          sed -i.bak -E "s/(version:\s*\")[^\"]+\"/\1${VERSION}\"/" mix.exs
+          rm mix.exs.bak
+          git add mix.exs
+          git commit -m "chore: bump version to $VERSION from tag"
+          git push origin "$BRANCH"
+
+      - name: Create PR
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          BRANCH="bump-version-to-${VERSION}"
+          gh pr create \
+            --base develop \
+            --head "$BRANCH" \
+            --title "chore: bump version to $VERSION" \
+            --body "Automated version bump to $VERSION"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
