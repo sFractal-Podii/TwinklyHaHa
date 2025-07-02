@@ -1,27 +1,18 @@
-# Copyright 2020 Google, LLC.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-name: Prod Deploy      
+name: Prod Deploy
 
 on:
   push:
     tags:
-    - 'v[0-9]+.[0-9]+.[0-9]+'   
-    - '!v*-*'
+      - 'v[0-9]+.[0-9]+.[0-9]+'   # e.g. v1.2.3 (no suffix)
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
 
 env:
   PROJECT_ID: ${{ secrets.GCE_PROJECT }}
+  GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
 
 jobs:
   setup-build-publish-deploy:
@@ -29,44 +20,78 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: prod
-    permissions:
-      contents: "read"
-      id-token: "write"
-    env:
-      GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
-
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - id: "auth"
-      uses: "google-github-actions/auth@v2"
-      with:
-        credentials_json: ${{ secrets.GCE_SA_KEY }}
+      - name: Extract tag version and update mix.exs
+        id: update_mix
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"       # v1.2.3
+          VERSION="${TAG#v}"                   # 1.2.3
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-    - uses: google-github-actions/setup-gcloud@v2
-      with:
-        version: "506.0.0"
+          sed -i.bak -E "s/(version:\s*\")[^\"]+\"/\1${VERSION}\"/" mix.exs
+          rm mix.exs.bak
+          echo "Updated mix.exs to version $VERSION"
 
-    - run: |-
-        gcloud --quiet auth configure-docker
+      - name: Create Pull Request to update version
+        run: |
+          VERSION="${{ env.VERSION }}"
+          BRANCH="bump-version-to-${VERSION}"
 
-    # Build the Docker image
-    - name: Build
-      run: |
-        echo '${{ secrets.RELEASES_SECRETS }}' >> config/releases.exs
-        docker build --tag "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF_NAME}" .
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    # Push the Docker image to Google Container Registry
-    - name: Publish
-      run: |-
-        docker push "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF_NAME}"
+          git checkout -b "$BRANCH"
+          git add mix.exs
+          git commit -m "chore: bump version to $VERSION from tag"
+          git push origin "$BRANCH"
 
-    - name: Deploy
-      id: deploy
-      uses: google-github-actions/deploy-cloudrun@v2
-      with:
-        service: twinklyhaha
-        region: us-east4
-        image: "gcr.io/duncan-openc2-plugfest/twinklyhaha:${{ github.ref_name }}"
+          sleep 5
+          gh pr create \
+            --base develop \
+            --head "$BRANCH" \
+            --title "chore: bump version to $VERSION from tag" \
+            --body "This PR updates \`mix.exs\` to version \`$VERSION\` from tag \`$GITHUB_REF_NAME\`"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge once checks pass
+        run: |
+          VERSION="${{ env.VERSION }}"
+          PR_URL=$(gh pr view bump-version-to-${VERSION} --json url -q .url)
+          echo "Enabling auto-merge on PR: $PR_URL"
+          gh pr merge "$PR_URL" --auto --squash --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: ${{ secrets.GCE_SA_KEY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: "506.0.0"
+
+      - run: gcloud --quiet auth configure-docker
+
+      - name: Build Docker image
+        run: |
+          echo '${{ secrets.RELEASES_SECRETS }}' >> config/releases.exs
+          docker build --tag "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF_NAME}" .
+
+      - name: Push Docker image
+        run: docker push "gcr.io/duncan-openc2-plugfest/twinklyhaha:${GITHUB_REF_NAME}"
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: twinklyhaha
+          region: us-east4
+          image: "gcr.io/duncan-openc2-plugfest/twinklyhaha:${{ github.ref_name }}"
