@@ -53,6 +53,8 @@ jobs:
           git commit -m "chore: bump version to $VERSION from tag"
           git push origin "$BRANCH"
 
+          sleep 5
+
           gh pr create \
             --base develop \
             --head "$BRANCH" \
