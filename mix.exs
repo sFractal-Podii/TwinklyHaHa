@@ -34,7 +34,7 @@ defmodule Twinklyhaha.MixProject do
     [
       {:phoenix, "~> 1.7"},
       {:phoenix_view, "~> 2.0"},
-      {:phoenix_live_view, "~> 1.0.17"},
+      {:phoenix_live_view, "~> 1.1.2"},
       {:phoenix_html, "~> 4.2.1"},
       {:phoenix_live_reload, "~> 1.5", only: :dev},
       {:phoenix_live_dashboard, "~> 0.8"},
@@ -56,7 +56,8 @@ defmodule Twinklyhaha.MixProject do
        runtime: false},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:openc2, git: "https://github.com/sFractal-Podii/openc2.git", branch: "main"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:lazy_html, ">= 0.1.0", only: :test}
     ]
   end
 
