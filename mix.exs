@@ -56,7 +56,8 @@ defmodule Twinklyhaha.MixProject do
        runtime: false},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:openc2, git: "https://github.com/sFractal-Podii/openc2.git", branch: "main"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:lazy_html, ">= 0.1.0", only: :test}
     ]
   end
 
