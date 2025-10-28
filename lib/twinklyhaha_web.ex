@@ -19,7 +19,10 @@ defmodule TwinklyhahaWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: TwinklyhahaWeb
+      use Phoenix.Controller,
+        formats: [:html, :json],
+        layouts: [html: TwinklyhahaWeb.Layouts]
+
       use Gettext, backend: TwinklyhahaWeb.Gettext
 
       import Plug.Conn
