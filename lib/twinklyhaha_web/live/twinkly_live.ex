@@ -24,7 +24,7 @@ defmodule TwinklyhahaWeb.TwinklyLive do
         <%= for row <- 0..7 do %>
           <%= for column <- 0..7 do %>
             <div class="led-box">
-            <div class={["led", "led-#{if @led_on?, do: "on", else: "off"}"]} id={"led-#{row}#{column}"} 
+            <div class={["led", "led-#{if @led_on?, do: "on", else: "off"}"]} id={"led-#{row}#{column}"}
                 data-ledcolor={if @current_color == "rainbow", do: Stream.cycle(@colors) |> Enum.at(row), else: @current_color} phx-hook="LedColor"></div>
             </div>
           <% end %>
@@ -40,10 +40,12 @@ defmodule TwinklyhahaWeb.TwinklyLive do
   end
 
   defp select_color(assigns) do
+    assigns = assign(assigns, select_drop_down_colours: @colors)
+
     ~H"""
     <form phx-change="change-color">
       <select id="select-colors" name="color">
-      <%= for color <- @colors do %>
+      <%= for color <- @select_drop_down_colours do %>
           <option value={color} selected={if @current_color == color, do: "selected"}  >
             <%= color %>
           </option>
